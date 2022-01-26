@@ -7,6 +7,25 @@
 
 import Foundation
 
+final class Helper {
+    static let shared = Helper()
+    
+    func performMemoryWarning(delay: Double, shouldRepeat: Bool) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self = self else { return }
+            if UIApplication.shared.responds(to: Selector("_performMemoryWarning")) {
+                UIApplication.shared.performSelector(onMainThread: Selector("_performMemoryWarning"), with: nil, waitUntilDone: false)
+            } else {
+                print("Whoops UIApplication no loger responds to -_performMemoryWarning")
+            }
+
+            if shouldRepeat {
+                self.performMemoryWarning(delay: delay, shouldRepeat: shouldRepeat)
+            }
+        }
+    }
+}
+
 @objcMembers class MemoryAllocate: NSObject {
     static let shared = MemoryAllocate()
     private var buffer: [UInt8]?
